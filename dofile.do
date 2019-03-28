@@ -21,10 +21,8 @@ Suppose that you observe an i.i.d. sample on the variables ChildMortality and Wa
 Suppose that, in your dataset, ChildMortality is 8% in municipalities that privatize. A
 Suppose that in your data set, ChildMortality is 14% in municipalities that do not privatize. 
 What are the OLS estimates of B0 and B1?
-*/
 
-* B1 = 8 - (14) = -6%
-* B2 = 14%
+*/
 
 
 ** Part 2: INSTRUMENTAL VARIABLE APPROACH **
@@ -43,27 +41,15 @@ Having health insurance is not independent from drug expenditure. Why?
 
 use http://zamek415.free.fr/mus06data, clear
 des
+gen agesq=age^2
 global x2list age agesq female totchr blhisp linc 
 sum ldrugexp hi_empunion $x2list
 
-* A1: Regression analysis
-reg ldrugexp hi_empunion
-* Having an insurance provided by employer or union increases drug expenditure by 9.67%
+* A1: Regression analysis: What is the effect of having an insurance provided by the employer or union on drug expenditure?
 
-* If there are omitted variables, we have bias and inconsistency in the OLS estimates
-reg ldrugexp hi_empunion age 
-gen agesq=age^2
-reg ldrugexp hi_empunion age agesq
-reg ldrugexp hi_empunion age agesq female
-reg ldrugexp hi_empunion age agesq female totchr
-reg ldrugexp hi_empunion age agesq female totchr blhisp
-reg ldrugexp hi_empunion age agesq female totchr blhisp linc 
-reg ldrugexp hi_empunion $x2list
+* A2: What variables mediate the relationship between having an additional insurance and drug expeniture?
 
-tab linc, missing
-keep if linc != .
-
-* A2: Instrumental variable approach
+* A3: Instrumental variable approach
 /*
 Endogeneity of independent variable (endogenous explanatory variable)
 causes also  the correlation with the error term which leads again to bias and inconsistency 
@@ -77,34 +63,7 @@ sum ssiratio lowincome multlc firmsz
 
 correlate hi_empunion ssiratio lowincome multlc firmsz 
 
-* Original OLS
-reg ldrugexp hi_empunion $x2list, vce(robust)
-
-* IV estimation of a just-identified model with single endog regressor
-ivregress 2sls ldrugexp (hi_empunion = ssiratio) $x2list, vce(robust) 
-* Cofficient  changes sign, from 0.074 (OLS) to  -0.898 (IV)!
-
-* Overidentified
-ivregress 2sls ldrugexp (hi_empunion = ssiratio multlc) $x2list, vce(robust) 
-estat endogenous
-* hi_empunion is endogenous
-estat overid
-* overidentifying restriction applies
-estat firststage
-
-quietly ivregress 2sls ldrugexp (hi_empunion = ssiratio) $x2list, vce(robust)
-estimates store ssiratio
-quietly ivregress 2sls ldrugexp (hi_empunion = lowincome) $x2list, vce(robust)
-estimates store lowincome
-quietly ivregress 2sls ldrugexp (hi_empunion = multlc) $x2list, vce(robust)
-estimates store multlc
-quietly ivregress 2sls ldrugexp (hi_empunion = firmsz) $x2list, vce(robust)
-estimates store firmsz
-quietly ivregress 2sls ldrugexp (hi_empunion = ssiratio lowincome multlc firmsz) $x2list, vce(robust)
-estimates store overid
-estimates table ssiratio lowincome multlc firmsz overid, b(%9.5f) se  
-
-* Check: http://cameron.econ.ucdavis.edu/bgpe2011/ for additional materials
+* Use command ivregress to fit an IV model and comment the results
 
 
 /*
@@ -134,7 +93,7 @@ Estimator: [(Coverage_under19_after1998)-(Coverage_under19_before1998)]-[(Covera
 
 * A1: Open the dataset and describe the variable. What are the relevant variables for our analysis?
 * Dataset available at: https://www.aeaweb.org/articles?id=10.1257/pol.3.1.129
-use "/Users/nicolo/Downloads/assignment2.dta", clear
+
 des
 sum
 
@@ -159,33 +118,10 @@ collapse (sum) count privhi pubhi insured, by(period age)
 gen perc_insured=insured/count*100
 twoway (line  perc_insured age if period==1, lcolor(blu)) || (line  perc_insured age if period==2) || (line  perc_insured age if period==3), xline(19)
 
-** A3: Implement Diff-in-Diff
-use "/Users/nicolo/Downloads/assignment2.dta", clear
-gen d_year=(year>1997)
-gen d_age=(a_age<19)
-gen dd=d_year*d_age
+** A3: Implement a Difference-in-Differences model: What is the effect of the reform on insurance coverage for teenagers aged 14-19?
 
-reg insured dd d_age d_year
-* Statistically significant 6.9 percentage point increase in insurance coverage for teenagers aged 14-19 associated with the introduction of SCHIP
-* Notice:
-probit  insured dd d_age d_year 
-margins, dydx(*)
+** A4: Is there a differential effect on public vs private insurance?
 
-
-** A4: Covariate Analysis
-xi: reg insured dd d_age d_year i.a_age i.year i.stfips
-xi: reg insured dd d_age d_year a_sex withparent married student i.a_age i.year i.stfips
-xi: reg insured dd d_age d_year a_sex withparent married student i.a_age i.year i.stfips if a_age>=16 & a_age<=22
-xi: reg insured dd d_age d_year a_sex withparent married student i.a_age i.year i.stfips if a_age>=16 & a_age<=22, cluster(a_age)    
-xi: reg insured dd d_age d_year faminctm1 a_sex withparent married student i.a_age i.year i.stfips if a_age>=16 & a_age<=22, cluster(a_age)    
-
-* A5: Crowding out
-xi: reg pubhi dd d_age d_year faminctm1 a_sex withparent married student i.a_age i.year i.stfips, cluster(a_age)    
-xi: reg privhi dd d_age d_year faminctm1 a_sex withparent married student i.a_age i.year i.stfips, cluster(a_age)    
-* 4.1 percentage point increase in public insurance coverage,  0.1 percentage point increase in private insurance coverage (not significant)
-* This corresponds to a crowding out rate of 15.61% (.0083705/.0535946)
-
-* Check:
 
 ** Part 4: COMPETITION ***
 use "/Users/nicolo/Downloads/concentration by hospital 10_26_16.dta", clear

@@ -24,50 +24,8 @@ What are the OLS estimates of B0 and B1?
 
 */
 
-
-** Part 2: INSTRUMENTAL VARIABLE APPROACH **
-* A. Colin Cameron and Pravin K. Trivedi (2008), "Microeconometrics using Stata" , Chapter 6, Stata Press
-
 /*
-Country:
-The original data is from the Medical Expenditure Panel Survey for United States residents over 65 
-
-Question:
-How does having (or not) a health insurance influence drug expenditure?
-
-Issue:
-Having health insurance is not independent from drug expenditure. Why?
-*/
-
-use http://zamek415.free.fr/mus06data, clear
-des
-gen agesq=age^2
-global x2list age agesq female totchr blhisp linc 
-sum ldrugexp hi_empunion $x2list
-
-* A1: Regression analysis: What is the effect of having an insurance provided by the employer or union on drug expenditure?
-
-* A2: What variables mediate the relationship between having an additional insurance and drug expeniture?
-
-* A3: Instrumental variable approach
-/*
-Endogeneity of independent variable (endogenous explanatory variable)
-causes also  the correlation with the error term which leads again to bias and inconsistency 
-in all of the OLS estimators
-*/
-
-*The idea is to find a third variable, which is correlated with the outcome variable only through the endogenous regressor (The instrument is exogenous)
-* In the dataset we have four candidate instruments:
-des ssiratio lowincome multlc firmsz
-sum ssiratio lowincome multlc firmsz 
-
-correlate hi_empunion ssiratio lowincome multlc firmsz 
-
-* Use command ivregress to fit an IV model and comment the results
-
-
-/*
-** Part 3: DIFFERENCE-IN-DIFFERENCES APPROACH **
+** Part 2: DIFFERENCE-IN-DIFFERENCES APPROACH **
 Levine, P.B., McKnight, R., and Heep, S. (2011), "How Effective are Public Policies to Increase Health Insurance Coverage Among Young Adults", American Economic Journal: Economic Policy 3 (February 2011): 129–156
 
 Country: 
@@ -121,6 +79,47 @@ twoway (line  perc_insured age if period==1, lcolor(blu)) || (line  perc_insured
 ** A3: Implement a Difference-in-Differences model: What is the effect of the reform on insurance coverage for teenagers aged 14-19?
 
 ** A4: Is there a differential effect on public vs private insurance?
+
+
+** Part 3: INSTRUMENTAL VARIABLE APPROACH **
+* A. Colin Cameron and Pravin K. Trivedi (2008), "Microeconometrics using Stata" , Chapter 6, Stata Press
+
+/*
+Country:
+The original data is from the Medical Expenditure Panel Survey for United States residents over 65 
+
+Question:
+How does having (or not) a health insurance influence drug expenditure?
+
+Issue:
+Having health insurance is not independent from drug expenditure. Why?
+*/
+
+use http://zamek415.free.fr/mus06data, clear
+des
+gen agesq=age^2
+global x2list age agesq female totchr blhisp linc 
+sum ldrugexp hi_empunion $x2list
+
+* A1: Regression analysis: What is the effect of having an insurance provided by the employer or union on drug expenditure?
+
+* A2: What variables mediate the relationship between having an additional insurance and drug expeniture?
+
+* A3: Instrumental variable approach
+/*
+Endogeneity of independent variable (endogenous explanatory variable)
+causes also  the correlation with the error term which leads again to bias and inconsistency 
+in all of the OLS estimators
+*/
+
+*The idea is to find a third variable, which is correlated with the outcome variable only through the endogenous regressor (The instrument is exogenous)
+* In the dataset we have four candidate instruments:
+des ssiratio lowincome multlc firmsz
+sum ssiratio lowincome multlc firmsz 
+
+correlate hi_empunion ssiratio lowincome multlc firmsz 
+
+* Use command ivregress to fit an IV model and comment the results
 
 
 ** Part 4: COMPETITION ***

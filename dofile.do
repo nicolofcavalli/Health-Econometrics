@@ -36,7 +36,7 @@ Up to 1997, Medicaid eligibility very restrictive (up to age 19)
 Very low rates of insurance coverage for older teenagers (14 to 19)
 
 Intervention: 
-The introduction State Children’s Health Insurance Program between 1997 and 1999u
+The introduction State Children’s Health Insurance Program between 1997 and 1999
 allows young to be covered under their parents’ employer-provided plan.
 
 Question: 

@@ -32,7 +32,7 @@ Country:
 United States
 
 Health policy issue:
-Up to 1997, Medicaid eligibility very restrictive (up to age 14)
+Up to 1997, Medicaid eligibility very restrictive (up to age 19)
 Very low rates of insurance coverage for older teenagers (14 to 19)
 
 Intervention: 
